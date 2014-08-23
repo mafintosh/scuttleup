@@ -1,0 +1,15 @@
+message Digest {
+  required string peer = 1;
+  required uint32 seq = 2;
+}
+
+message Handshake {
+  required string id = 1;
+  repeated Digest head = 2;
+}
+
+message Change {
+  required string peer = 1;
+  required uint32 seq = 2;
+  required bytes entry = 3;
+}

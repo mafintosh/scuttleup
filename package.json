@@ -1,0 +1,29 @@
+{
+  "name": "scuttleup",
+  "version": "0.0.0",
+  "description": "WIP - nothing to see here",
+  "main": "index.js",
+  "dependencies": {
+    "cuid": "^1.2.4",
+    "duplexify": "^3.1.3",
+    "from2": "^1.2.0",
+    "length-prefixed-stream": "^1.0.0",
+    "level-peek": "^2.0.0",
+    "lexicographic-integer": "^1.1.0",
+    "multistream": "^1.4.1",
+    "protocol-buffers": "^2.3.4",
+    "pump": "^0.3.5",
+    "through2": "^0.6.1"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mafintosh/scuttleup.git"
+  },
+  "author": "Mathias Buus (@mafintosh)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mafintosh/scuttleup/issues"
+  },
+  "homepage": "https://github.com/mafintosh/scuttleup"
+}
