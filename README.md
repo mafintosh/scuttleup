@@ -55,6 +55,9 @@ Create a log new instance. Options can include
 
 Add a new entry to the log
 
+#### `var ws = log.createAppendStream()`
+
+`.append` as a stream
 
 #### `var repl = log.createReplicationStream()`
 

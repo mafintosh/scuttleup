@@ -146,6 +146,13 @@ Log.prototype.append = function(entry, cb) {
   }, cb)
 }
 
+Log.prototype.createAppendStream = function() {
+  var self = this
+  return through.obj(function(data, enc, cb) {
+    self.append(data, cb)
+  })
+}
+
 Log.prototype.createReplicationStream = function() {
   if (this.corked) return this._wait(this.createReplicationStream, arguments, true)
 
