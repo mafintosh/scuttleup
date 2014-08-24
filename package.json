@@ -1,7 +1,7 @@
 {
   "name": "scuttleup",
   "version": "0.0.0",
-  "description": "WIP - nothing to see here",
+  "description": "Scuttlebutt like eventual consistent log replication for levelup",
   "main": "index.js",
   "dependencies": {
     "cuid": "^1.2.4",
