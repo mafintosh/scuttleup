@@ -31,7 +31,7 @@ var loadHead = function(db, cb) {
 
   var loop = function(prev) {
     peek.first(db, {start:prev, end:CHANGE+SEP}, function(err, key) {
-      if (err && err.message === 'range not found') return cb(null, head)
+      if (err && err.message === 'range not found' || !key) return cb(null, head)
       if (err) return cb(err)
 
       var peer = key.slice(CHANGE.length, key.lastIndexOf(SEP))
