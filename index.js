@@ -175,6 +175,9 @@ Log.prototype.createReplicationStream = function() {
     handshake = data
     seqs = getSeqs(handshake.head)
 
+    result.id = handshake.id
+    result.emit('connect', handshake.id, handshake.peers)
+
     var map = function(change) {
       if (seqs[change.peer] >= change.seq) return null // already has this change
       return messages.Change.encode(change)
