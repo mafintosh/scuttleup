@@ -59,14 +59,22 @@ Add a new entry to the log
 
 `.append` as a stream
 
-#### `var repl = log.createReplicationStream()`
+#### `var repl = log.createReplicationStream(opts)`
 
 Create a log replication stream. Pipe this to the replication stream of another log.
 Replication is eventual consistent and works using the [scuttlebutt protocol](http://www.cs.cornell.edu/home/rvr/papers/flowgossip.pdf)
 
+Options can include
+
+``` js
+{
+  live: false // disable live replication. defaults to true
+}
+```
+
 #### `var rs = log.createReadStream(opts)`
 
-Create a log read stream. Options cal include
+Create a log read stream. Options can include
 
 ``` js
 {

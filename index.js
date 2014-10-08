@@ -153,8 +153,9 @@ Log.prototype.createAppendStream = function() {
   })
 }
 
-Log.prototype.createReplicationStream = function() {
+Log.prototype.createReplicationStream = function(opts) {
   if (this.corked) return this._wait(this.createReplicationStream, arguments, true)
+  if (!opts) opts = {}
 
   var self = this
   var handshake = null
@@ -184,7 +185,7 @@ Log.prototype.createReplicationStream = function() {
     }
 
     var rs = self.createReadStream({
-      live: true,
+      live: opts.live !== false,
       valueEncoding: 'binary',
       since: handshake.head,
       map: map
