@@ -411,7 +411,7 @@ Log.prototype._onflush = function(err) {
   for (var i = 0; i < writing.length; i++) {
     var w = writing[i]
     w.peer.flushed = w.change.seq
-    w.callback(null, w.change)
+    w.callback(null)
     this.emit('append', w.change)
   }
 
