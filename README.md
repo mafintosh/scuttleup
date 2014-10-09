@@ -68,7 +68,8 @@ Options can include
 
 ``` js
 {
-  live: false // disable live replication. defaults to true
+  live: false, // disable live replication. defaults to true
+  mode: 'sync' | 'push' | 'pull' // set replication mode. defaults to sync
 }
 ```
 
