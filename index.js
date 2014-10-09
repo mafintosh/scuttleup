@@ -143,6 +143,15 @@ Log.prototype.uncork = function() {
   while (this._waiting.length) this._waiting.shift()()
 }
 
+Log.prototype.entry = function(peer, seq, opts, cb) {
+  if (this.corked) return this._wait(this.entry, arguments, false)
+  if (typeof opts === 'function') return this.entry(peer, seq, null, opts)
+  if (!opts) opts = {}
+
+  opts.valueEncoding = opts.valueEncoding || this._encoding
+  this.db.get(encodeKey(peer, seq), opts, cb)
+}
+
 Log.prototype.append = function(entry, cb) {
   if (this.corked) return this._wait(this.append, arguments, false)
 
@@ -361,14 +370,12 @@ Log.prototype._write = function(change, cb) {
 
   peer.seq = change.seq
 
-  this.emit('append', change)
-
   this._batch.push({
     type: 'put',
     key: encodeKey(change.peer, change.seq),
     value: change.entry,
     valueEncoding: this._encoding,
-    seq: change.seq,
+    change: change,
     peer: peer,
     callback: cb
   })
@@ -391,8 +398,9 @@ Log.prototype._onflush = function(err) {
 
   for (var i = 0; i < writing.length; i++) {
     var w = writing[i]
-    w.peer.flushed = w.seq
-    w.callback()
+    w.peer.flushed = w.change.seq
+    w.callback(null, w.change)
+    this.emit('append', w.change)
   }
 
   this.emit('flush', writing)

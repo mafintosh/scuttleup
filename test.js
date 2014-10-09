@@ -139,3 +139,17 @@ tape('push replication', function(t) {
     }))
   }, 100)
 })
+
+tape('get entry', function(t) {
+  var a = init()
+
+  a.on('append', function(data) {
+    a.entry(data.peer, data.seq, function(err, entry) {
+      t.error(err, 'no err')
+      t.same(entry, new Buffer('hello world'))
+      t.end()
+    })
+  })
+
+  a.append(new Buffer('hello world'))
+})
