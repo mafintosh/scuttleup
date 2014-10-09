@@ -3,11 +3,11 @@ var through = require('through2')
 var duplexify = require('duplexify')
 var multistream = require('multistream')
 var pump = require('pump')
-var peek = require('level-peek')
 var lexi = require('lexicographic-integer')
 var from = require('from2')
 var lpstream = require('length-prefixed-stream')
 var protobuf = require('protocol-buffers')
+var once = require('once')
 var util = require('util')
 var fs = require('fs')
 var events = require('events')
@@ -16,8 +16,8 @@ var path = require('path')
 var messages = protobuf(fs.readFileSync(path.join(__dirname, 'schema.proto')))
 
 var SEP = '\xff'
-var CHANGE = SEP+'c'+SEP
-var META = SEP+'m'+SEP
+var CHANGE = 'c'+SEP
+var META = 'm'+SEP
 
 var noop = function() {}
 
@@ -25,22 +25,34 @@ var echo = function(val) {
   return val
 }
 
+var read = function(stream, cb) {
+  var result = null
+
+  cb = once(cb)
+  stream.on('error', cb)
+  stream.on('data', function(data) {
+    result = data
+  })
+  stream.on('end', function() {
+    cb(null, result)
+  })
+}
+
 var loadHead = function(db, cb) {
   var head = []
   var next
 
   var loop = function(prev) {
-    peek.first(db, {start:prev, end:CHANGE+SEP}, function(err, key) {
-      if (err && err.message === 'range not found' || !key) return cb(null, head)
+    read(db.createKeyStream({start:prev, end:CHANGE+SEP, limit:1}), function(err, key) {
       if (err) return cb(err)
+      if (!key) return cb(null, head)
 
       var peer = key.slice(CHANGE.length, key.lastIndexOf(SEP))
 
-      peek.last(db, {end:CHANGE+peer+SEP+SEP}, function(err, key) {
+      read(db.createKeyStream({start:CHANGE+peer+SEP+SEP, end:CHANGE+peer, reverse:true, limit:1}), function(err, key) {
         if (err) return cb(err)
 
         var seq = lexi.unpack(key.slice(key.indexOf(SEP, CHANGE.length)+1), 'hex')
-
         head.push({peer:peer, seq:seq, flushed:seq})
 
         loop(CHANGE+peer+SEP+SEP)
