@@ -84,6 +84,15 @@ var decodeKey = function(key) {
   }
 }
 
+var toMode = function(mode) {
+  switch (mode) {
+    case 'sync': return messages.Mode.SYNC
+    case 'push': return messages.Mode.PUSH
+    case 'pull': return messages.Mode.PULL
+  }
+  return messages.Mode.SYNC
+}
+
 var getSeqs = function(head) {
   var seqs = {}
   for (var i = 0; i < head.length; i++) seqs[head[i].peer] = head[i].seq
@@ -160,6 +169,7 @@ Log.prototype.createReplicationStream = function(opts) {
   var self = this
   var handshake = null
   var seqs = null
+  var mode = toMode(opts.mode || 'sync')
 
   var pack = lpstream.encode()
   var unpack = lpstream.decode()
@@ -184,6 +194,11 @@ Log.prototype.createReplicationStream = function(opts) {
       return messages.Change.encode(change)
     }
 
+    if (mode === messages.Mode.PULL || handshake.mode === messages.Mode.PUSH) {
+      pack.end()
+      return cb()
+    }
+
     var rs = self.createReadStream({
       live: opts.live !== false,
       valueEncoding: 'binary',
@@ -201,7 +216,11 @@ Log.prototype.createReplicationStream = function(opts) {
   })
 
   pump(unpack, ws)
-  pack.write(messages.Handshake.encode(this))
+  pack.write(messages.Handshake.encode({
+    id: this.id,
+    head: this.head,
+    mode: mode
+  }))
 
   return result
 }

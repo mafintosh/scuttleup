@@ -1,3 +1,9 @@
+enum Mode {
+  SYNC = 1;
+  PUSH = 2;
+  PULL = 3;
+}
+
 message Digest {
   required string peer = 1;
   required uint32 seq = 2;
@@ -6,6 +12,7 @@ message Digest {
 message Handshake {
   required string id = 1;
   repeated Digest head = 2;
+  optional Mode mode = 3 [default = SYNC];
 }
 
 message Change {

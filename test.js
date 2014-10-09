@@ -83,3 +83,59 @@ tape('basic replication', function(t) {
     }))
   }, 100)
 })
+
+tape('pull replication', function(t) {
+  var a = init()
+  var b = init()
+
+  var as = a.createReplicationStream({mode:'pull'})
+  var bs = b.createReplicationStream()
+
+  as.pipe(bs).pipe(as)
+
+  a.append(new Buffer('i am a'))
+  b.append(new Buffer('i am b'))
+
+  var sort = function(a, b) {
+    return a.entry.toString().localeCompare(b.entry.toString())
+  }
+
+  setTimeout(function() {
+    a.createReadStream().pipe(concat(function(alist) {
+      b.createReadStream().pipe(concat(function(blist) {
+        t.same(alist.length, 2)
+        t.same(blist.length, 1)
+        t.same(blist[0].entry, new Buffer('i am b'))
+        t.end()
+      }))
+    }))
+  }, 100)
+})
+
+tape('push replication', function(t) {
+  var a = init()
+  var b = init()
+
+  var as = a.createReplicationStream()
+  var bs = b.createReplicationStream({mode:'push'})
+
+  as.pipe(bs).pipe(as)
+
+  a.append(new Buffer('i am a'))
+  b.append(new Buffer('i am b'))
+
+  var sort = function(a, b) {
+    return a.entry.toString().localeCompare(b.entry.toString())
+  }
+
+  setTimeout(function() {
+    a.createReadStream().pipe(concat(function(alist) {
+      b.createReadStream().pipe(concat(function(blist) {
+        t.same(alist.length, 2)
+        t.same(blist.length, 1)
+        t.same(blist[0].entry, new Buffer('i am b'))
+        t.end()
+      }))
+    }))
+  }, 100)
+})
