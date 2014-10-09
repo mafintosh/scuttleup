@@ -55,6 +55,10 @@ Create a log new instance. Options can include
 
 Add a new entry to the log
 
+#### `log.entry(peer, seq, [options], callback)`
+
+Retrieve a entry from the log from a given `peer` and `seq`
+
 #### `var ws = log.createAppendStream()`
 
 `.append` as a stream
