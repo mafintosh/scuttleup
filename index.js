@@ -173,7 +173,7 @@ Log.prototype.append = function(entry, cb) {
     peer: this.id,
     seq: me.seq+1,
     entry: entry
-  }, cb)
+  }, this._encoding, cb)
 }
 
 Log.prototype.createAppendStream = function() {
@@ -198,7 +198,7 @@ Log.prototype.createReplicationStream = function(opts) {
 
   var ondata = function(data, cb) {
     seqs[data.peer] = data.seq
-    self._write(data, cb)
+    self._write(data, 'binary', cb)
   }
 
   var onhandshake = function(data, cb) {
@@ -246,12 +246,16 @@ Log.prototype.createReplicationStream = function(opts) {
   return result
 }
 
-Log.prototype.createWriteStream = function() {
+Log.prototype.createWriteStream = function(opts) {
   if (this.corked) return this._wait(this.createWriteStream, arguments, true)
 
+  if (!opts) opts = {}
+
   var self = this
+  var encoding = opts.valueEncoding || this._encoding
+
   return through.obj(function(change, enc, cb) {
-    self._write(change, cb)
+    self._write(change, encoding, cb)
   })
 }
 
@@ -373,7 +377,7 @@ Log.prototype._tail = function(head, opts) {
   return tail
 }
 
-Log.prototype._write = function(change, cb) {
+Log.prototype._write = function(change, enc, cb) {
   if (!cb) cb = noop
 
   var peer = this._getPeer(change.peer, change.seq-1)
@@ -386,7 +390,7 @@ Log.prototype._write = function(change, cb) {
     type: 'put',
     key: encodeKey(change.peer, change.seq),
     value: change.entry,
-    valueEncoding: this._encoding,
+    valueEncoding: enc || this._encoding,
     change: change,
     peer: peer,
     callback: cb
