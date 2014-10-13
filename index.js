@@ -43,13 +43,18 @@ var loadHead = function(db, cb) {
   var next
 
   var loop = function(prev) {
-    read(db.createKeyStream({start:prev, end:CHANGE+SEP, limit:1}), function(err, key) {
+    read(db.createKeyStream({gte:prev, lte:CHANGE+SEP, limit:1}), function(err, key) {
       if (err) return cb(err)
       if (!key) return cb(null, head)
 
       var peer = key.slice(CHANGE.length, key.lastIndexOf(SEP))
 
-      read(db.createKeyStream({start:CHANGE+peer+SEP+SEP, end:CHANGE+peer, reverse:true, limit:1}), function(err, key) {
+      read(db.createKeyStream({
+        gte:CHANGE+peer+SEP,
+        lte:CHANGE+peer+SEP+SEP,
+        reverse:true,
+        limit:1
+      }), function(err, key) {
         if (err) return cb(err)
 
         var seq = lexi.unpack(key.slice(key.indexOf(SEP, CHANGE.length)+1), 'hex')
@@ -277,8 +282,8 @@ Log.prototype.createReadStream = function(opts) {
   var streams = head.map(function(h) {
     return function() {
       var rs = self.db.createReadStream({
-        start: encodeKey(h.peer, h.seq+1),
-        end: encodeKey(h.peer, -1),
+        gte: encodeKey(h.peer, h.seq+1),
+        lte: encodeKey(h.peer, -1),
         valueEncoding: opts.valueEncoding
       })
 
