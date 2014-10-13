@@ -1,6 +1,6 @@
 {
   "name": "scuttleup",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Scuttlebutt like eventual consistent log replication for levelup",
   "main": "index.js",
   "dependencies": {
