@@ -171,14 +171,19 @@ Log.prototype.entry = function(peer, seq, opts, cb) {
 
 Log.prototype.append = function(entry, cb) {
   if (this.corked) return this._wait(this.append, arguments, false)
+  if (!cb) cb = noop
 
   var me = this._getPeer(this.id, 0)
-
-  this._write({
+  var change = {
     peer: this.id,
     seq: me.seq+1,
     entry: entry
-  }, this._encoding, cb)
+  }
+
+  this._write(change, this._encoding, function(err) {
+    if (err) return cb(err)
+    cb(null, change)
+  })
 }
 
 Log.prototype.createAppendStream = function() {
