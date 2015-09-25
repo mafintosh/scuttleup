@@ -169,6 +169,10 @@ Log.prototype.entry = function(peer, seq, opts, cb) {
   this.db.get(encodeKey(peer, seq), opts, cb)
 }
 
+Log.prototype.del = function(peer, seq, cb) {
+  this.db.del(encodeKey(peer, seq), cb)
+}
+
 Log.prototype.append = function(entry, cb) {
   if (this.corked) return this._wait(this.append, arguments, false)
   if (!cb) cb = noop
