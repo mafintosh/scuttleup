@@ -362,9 +362,11 @@ Log.prototype._tail = function(head, opts) {
     }
 
     self.db.get(encodeKey(h.peer, h.seq+1), {valueEncoding:opts.valueEncoding}, function(err, data) {
-      if (err) return cb(err)
+      if (err && !err.notFound) return cb(err)
 
       h.seq++
+
+      if (! data) return read(size, cb)
 
       var change = {
         peer: h.peer,
