@@ -170,6 +170,7 @@ Log.prototype.entry = function(peer, seq, opts, cb) {
 }
 
 Log.prototype.del = function(peer, seq, cb) {
+  if (this.corked) return this._wait(this.del, arguments, false)
   this.db.del(encodeKey(peer, seq), cb)
 }
 
