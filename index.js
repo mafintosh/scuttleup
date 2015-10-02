@@ -169,6 +169,10 @@ Log.prototype.entry = function(peer, seq, opts, cb) {
   this.db.get(encodeKey(peer, seq), opts, cb)
 }
 
+Log.prototype.del = function(peer, seq, cb) {
+  this.db.del(encodeKey(peer, seq), cb)
+}
+
 Log.prototype.append = function(entry, cb) {
   if (this.corked) return this._wait(this.append, arguments, false)
   if (!cb) cb = noop
@@ -358,9 +362,11 @@ Log.prototype._tail = function(head, opts) {
     }
 
     self.db.get(encodeKey(h.peer, h.seq+1), {valueEncoding:opts.valueEncoding}, function(err, data) {
-      if (err) return cb(err)
+      if (err && !err.notFound) return cb(err)
 
       h.seq++
+
+      if (! data) return read(size, cb)
 
       var change = {
         peer: h.peer,

@@ -153,3 +153,19 @@ tape('get entry', function(t) {
 
   a.append(new Buffer('hello world'))
 })
+
+tape('del entry', function(t) {
+  var a = init()
+
+  a.on('append', function(data) {
+    a.del(data.peer, data.seq, function(err) {
+      t.error(err, 'no err')
+      a.entry(data.peer, data.seq, function(err, entry) {
+        t.ok(err && err.notFound, 'error is not found')
+        t.end()
+      })
+    })
+  })
+
+  a.append(new Buffer('hello world'))
+})
