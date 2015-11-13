@@ -13,7 +13,7 @@ npm install scuttleup
 ``` js
 var scuttleup = require('scuttleup')
 
-var log = scutlleup(db) // db is a levelup instance
+var log = scuttleup(db) // db is a levelup instance
 
 var changes = log2.createReadStream({
   live: true
