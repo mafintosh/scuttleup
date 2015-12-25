@@ -1,6 +1,6 @@
 # scuttleup
 
-Scuttlebutt like eventual consistent log replication for levelup
+Scuttlebutt like eventual consistent log replication for leveldb
 
 ```
 npm install scuttleup
@@ -15,7 +15,7 @@ var scuttleup = require('scuttleup')
 
 var log = scuttleup(db) // db is a levelup instance
 
-var changes = log2.createReadStream({
+var changes = log.createReadStream({
   live: true
 })
 
