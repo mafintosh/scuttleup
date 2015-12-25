@@ -1,6 +1,6 @@
 # scuttleup
 
-Scuttlebutt like eventual consistent log replication for leveldb
+Scuttlebutt like eventual consistent log replication for levelup
 
 ```
 npm install scuttleup
